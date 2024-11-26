@@ -37,6 +37,16 @@ const getClientsByAge = async (req, res) => {
     res.json(sortedByAge);
 }
 
+const getClientsAverage = async (req, res) => {
+    const clients = await readClients();
+
+    const totalClients = clients.length;
+    const totalAge = clients.reduce((sum, client) => sum + calculateAge(client.birthday), 0);
+    const averageAge = totalClients ? totalAge / totalClients : 0;
+
+    res.json({ totalClients, averageAge });
+};
+
 const calculateAge = (birthday) => {
     const birthDate = new Date(birthday);
     const currentDate = new Date();
@@ -50,5 +60,6 @@ const calculateAge = (birthday) => {
 module.exports = {
     addClient,
     getClientsSoretedByName,
-    getClientsByAge
+    getClientsByAge,
+    getClientsAverage
 }
