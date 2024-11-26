@@ -1,4 +1,4 @@
-import fs from 'fs'
+const fs = require('fs').promises;
 
 const CLIENTS_FILE = './Clients.json'
 

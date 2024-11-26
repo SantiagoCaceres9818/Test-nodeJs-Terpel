@@ -1,5 +1,5 @@
-import { readClients, writeClients } from '../utils/fileHandler.js'
-import { Client } from '../models/Client.js'
+const { readClients, writeClients } = require('../utils/fileHandler.js');
+const Client = require ('../models/Client')
 
 const addClient = async (req, res) => {
     try {
@@ -15,12 +15,40 @@ const addClient = async (req, res) => {
         await writeClients(clients);
         res.status(201).json({ message: 'Sucessfully client save.', client: newClient });
     } catch (error) {
-        res.status(201).json({ message: error.message, client: newClient });
+        console.error(error.message);
+        res.status(500).json({ message: 'An error occurred while adding the client.' });
     }
 };
 
 const getClientsSoretedByName = async (req, res) => {
     const clients = await readClients();
-    const sortedClients = [...clients].sort((client1,client2) => client1.name.localCompare(client2.name));
+    const sortedClients = [...clients].sort((client1,client2) => client1.name.localeCompare(client2.name));
     res.json(sortedClients);
+}
+
+const getClientsByAge = async (req, res) => {
+    const clients = await readClients();
+
+    const sortedByAge = clients.map((client) => {
+        const age = calculateAge(client.birthday);
+        return { name: client.name, age };
+    }).sort((a, b) => a.age - b.age);
+
+    res.json(sortedByAge);
+}
+
+const calculateAge = (birthday) => {
+    const birthDate = new Date(birthday);
+    const currentDate = new Date();
+    
+    const miliseconds = currentDate - birthDate;
+    const ageInYears = miliseconds / (1000 * 60 * 60 * 24 * 365.25);
+    
+    return Math.floor(ageInYears); 
+}
+
+module.exports = {
+    addClient,
+    getClientsSoretedByName,
+    getClientsByAge
 }
